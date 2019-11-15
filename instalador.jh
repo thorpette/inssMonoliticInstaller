@@ -1,0 +1,36 @@
+
+entity Instalacion {
+	name String required,
+    descripcion String
+}
+
+
+entity Paso {
+	name String required
+    command Command,
+    origen String,
+    destino String,
+    parametro String
+}
+
+enum Command {
+     ROBOCOPY, DELETE
+}
+
+
+relationship OneToMany {
+	Instalacion{paso} to Paso,
+    
+}
+
+
+paginate Instalacion with pagination
+
+
+service all with serviceImpl 
+
+
+
+
+
+
