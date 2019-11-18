@@ -1,0 +1,64 @@
+<div class="row justify-content-center">
+    <div class="col-8">
+        <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+            <h2 id="jhi-paso-heading">Create or edit a Paso</h2>
+            <div>
+                <jhi-alert-error></jhi-alert-error>
+                <div class="form-group" [hidden]="!editForm.get('id').value">
+                    <label for="id">ID</label>
+                    <input type="text" class="form-control" id="id" name="id" formControlName="id"
+                        readonly />
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" for="field_name">Name</label>
+                    <input type="text" class="form-control" name="name" id="field_name"
+                           formControlName="name"/>
+                    <div *ngIf="editForm.get('name').invalid && (editForm.get('name').dirty || editForm.get('name').touched)">
+                        <small class="form-text text-danger"
+                               *ngIf="editForm.get('name').errors.required">
+                        This field is required.
+                        </small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" for="field_command">Command</label>
+                    <select class="form-control" name="command" formControlName="command" id="field_command">
+                        <option value="ROBOCOPY">ROBOCOPY</option>
+                        <option value="DELETE">DELETE</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" for="field_origen">Origen</label>
+                    <input type="text" class="form-control" name="origen" id="field_origen"
+                           formControlName="origen"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" for="field_destino">Destino</label>
+                    <input type="text" class="form-control" name="destino" id="field_destino"
+                           formControlName="destino"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" for="field_parametro">Parametro</label>
+                    <input type="text" class="form-control" name="parametro" id="field_parametro"
+                           formControlName="parametro"/>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-control-label" for="field_instalacion">Instalacion</label>
+                    <select class="form-control" id="field_instalacion" name="instalacion" formControlName="instalacion">
+                        <option [ngValue]="null"></option>
+                        <option [ngValue]="instalacionOption.id === editForm.get('instalacion').value?.id ? editForm.get('instalacion').value : instalacionOption" *ngFor="let instalacionOption of instalacions; trackBy: trackInstalacionById">{{instalacionOption.id}}</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <button type="button" id="cancel-save" class="btn btn-secondary"  (click)="previousState()">
+                    <fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span>Cancel</span>
+                </button>
+                <button type="submit" id="save-entity" [disabled]="editForm.invalid || isSaving" class="btn btn-primary">
+                    <fa-icon [icon]="'save'"></fa-icon>&nbsp;<span>Save</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

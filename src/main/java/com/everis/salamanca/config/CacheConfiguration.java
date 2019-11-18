@@ -42,6 +42,9 @@ public class CacheConfiguration {
             createCache(cm, com.everis.salamanca.domain.User.class.getName());
             createCache(cm, com.everis.salamanca.domain.Authority.class.getName());
             createCache(cm, com.everis.salamanca.domain.User.class.getName() + ".authorities");
+            createCache(cm, com.everis.salamanca.domain.Instalacion.class.getName());
+            createCache(cm, com.everis.salamanca.domain.Instalacion.class.getName() + ".pasos");
+            createCache(cm, com.everis.salamanca.domain.Paso.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }

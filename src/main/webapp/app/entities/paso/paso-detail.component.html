@@ -1,0 +1,49 @@
+<div class="row justify-content-center">
+    <div class="col-8">
+        <div *ngIf="paso">
+            <h2><span>Paso</span> {{paso.id}}</h2>
+            <hr>
+            <jhi-alert-error></jhi-alert-error>
+            <dl class="row-md jh-entity-details">
+                <dt><span>Name</span></dt>
+                <dd>
+                    <span>{{paso.name}}</span>
+                </dd>
+                <dt><span>Command</span></dt>
+                <dd>
+                    <span>{{paso.command}}</span>
+                </dd>
+                <dt><span>Origen</span></dt>
+                <dd>
+                    <span>{{paso.origen}}</span>
+                </dd>
+                <dt><span>Destino</span></dt>
+                <dd>
+                    <span>{{paso.destino}}</span>
+                </dd>
+                <dt><span>Parametro</span></dt>
+                <dd>
+                    <span>{{paso.parametro}}</span>
+                </dd>
+                <dt><span>Instalacion</span></dt>
+                <dd>
+                    <div *ngIf="paso.instalacion">
+                        <a [routerLink]="['/instalacion', paso.instalacion?.id, 'view']">{{paso.instalacion?.id}}</a>
+                    </div>
+                </dd>
+            </dl>
+
+            <button type="submit"
+                    (click)="previousState()"
+                    class="btn btn-info">
+                <fa-icon [icon]="'arrow-left'"></fa-icon>&nbsp;<span> Back</span>
+            </button>
+
+            <button type="button"
+                    [routerLink]="['/paso', paso.id, 'edit']"
+                    class="btn btn-primary">
+                <fa-icon [icon]="'pencil-alt'"></fa-icon>&nbsp;<span> Edit</span>
+            </button>
+        </div>
+    </div>
+</div>
