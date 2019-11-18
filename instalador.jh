@@ -13,6 +13,14 @@ entity Paso {
     parametro String
 }
 
+
+entity Mock {
+	name String required
+    input String,
+    output String,
+    url String
+}
+
 enum Command {
      ROBOCOPY, DELETE
 }
@@ -25,7 +33,7 @@ relationship OneToMany {
 
 
 paginate Instalacion with pagination
-
+paginate Paso with pagination
 
 service all with serviceImpl 
 
