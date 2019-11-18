@@ -1,0 +1,48 @@
+{
+    "name": "Paso",
+    "fields": [
+        {
+            "fieldName": "name",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "command",
+            "fieldType": "Command",
+            "fieldValues": "ROBOCOPY,DELETE"
+        },
+        {
+            "fieldName": "origen",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "destino",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "parametro",
+            "fieldType": "String"
+        }
+    ],
+    "relationships": [
+        {
+            "relationshipType": "many-to-one",
+            "otherEntityName": "instalacion",
+            "otherEntityRelationshipName": "paso",
+            "relationshipName": "instalacion",
+            "otherEntityField": "id"
+        }
+    ],
+    "changelogDate": "20191118081816",
+    "entityTableName": "paso",
+    "dto": "no",
+    "pagination": "pagination",
+    "service": "serviceImpl",
+    "jpaMetamodelFiltering": false,
+    "fluentMethods": true,
+    "readOnly": false,
+    "clientRootFolder": "",
+    "applications": "*"
+}
