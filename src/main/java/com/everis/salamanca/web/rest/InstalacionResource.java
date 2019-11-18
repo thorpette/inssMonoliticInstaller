@@ -3,6 +3,8 @@ package com.everis.salamanca.web.rest;
 import com.everis.salamanca.domain.Instalacion;
 import com.everis.salamanca.service.InstalacionService;
 import com.everis.salamanca.web.rest.errors.BadRequestAlertException;
+import com.everis.salamanca.service.dto.InstalacionCriteria;
+import com.everis.salamanca.service.InstalacionQueryService;
 
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.PaginationUtil;
@@ -41,8 +43,11 @@ public class InstalacionResource {
 
     private final InstalacionService instalacionService;
 
-    public InstalacionResource(InstalacionService instalacionService) {
+    private final InstalacionQueryService instalacionQueryService;
+
+    public InstalacionResource(InstalacionService instalacionService, InstalacionQueryService instalacionQueryService) {
         this.instalacionService = instalacionService;
+        this.instalacionQueryService = instalacionQueryService;
     }
 
     /**
@@ -91,14 +96,27 @@ public class InstalacionResource {
 
      * @param pageable the pagination information.
 
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of instalacions in body.
      */
     @GetMapping("/instalacions")
-    public ResponseEntity<List<Instalacion>> getAllInstalacions(Pageable pageable) {
-        log.debug("REST request to get a page of Instalacions");
-        Page<Instalacion> page = instalacionService.findAll(pageable);
+    public ResponseEntity<List<Instalacion>> getAllInstalacions(InstalacionCriteria criteria, Pageable pageable) {
+        log.debug("REST request to get Instalacions by criteria: {}", criteria);
+        Page<Instalacion> page = instalacionQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+    * {@code GET  /instalacions/count} : count all the instalacions.
+    *
+    * @param criteria the criteria which the requested entities should match.
+    * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+    */
+    @GetMapping("/instalacions/count")
+    public ResponseEntity<Long> countInstalacions(InstalacionCriteria criteria) {
+        log.debug("REST request to count Instalacions by criteria: {}", criteria);
+        return ResponseEntity.ok().body(instalacionQueryService.countByCriteria(criteria));
     }
 
     /**

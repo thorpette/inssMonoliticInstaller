@@ -3,6 +3,8 @@ package com.everis.salamanca.web.rest;
 import com.everis.salamanca.domain.Paso;
 import com.everis.salamanca.service.PasoService;
 import com.everis.salamanca.web.rest.errors.BadRequestAlertException;
+import com.everis.salamanca.service.dto.PasoCriteria;
+import com.everis.salamanca.service.PasoQueryService;
 
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.PaginationUtil;
@@ -41,8 +43,11 @@ public class PasoResource {
 
     private final PasoService pasoService;
 
-    public PasoResource(PasoService pasoService) {
+    private final PasoQueryService pasoQueryService;
+
+    public PasoResource(PasoService pasoService, PasoQueryService pasoQueryService) {
         this.pasoService = pasoService;
+        this.pasoQueryService = pasoQueryService;
     }
 
     /**
@@ -91,14 +96,27 @@ public class PasoResource {
 
      * @param pageable the pagination information.
 
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of pasos in body.
      */
     @GetMapping("/pasos")
-    public ResponseEntity<List<Paso>> getAllPasos(Pageable pageable) {
-        log.debug("REST request to get a page of Pasos");
-        Page<Paso> page = pasoService.findAll(pageable);
+    public ResponseEntity<List<Paso>> getAllPasos(PasoCriteria criteria, Pageable pageable) {
+        log.debug("REST request to get Pasos by criteria: {}", criteria);
+        Page<Paso> page = pasoQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+    * {@code GET  /pasos/count} : count all the pasos.
+    *
+    * @param criteria the criteria which the requested entities should match.
+    * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+    */
+    @GetMapping("/pasos/count")
+    public ResponseEntity<Long> countPasos(PasoCriteria criteria) {
+        log.debug("REST request to count Pasos by criteria: {}", criteria);
+        return ResponseEntity.ok().body(pasoQueryService.countByCriteria(criteria));
     }
 
     /**

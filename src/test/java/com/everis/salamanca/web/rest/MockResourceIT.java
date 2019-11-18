@@ -5,6 +5,8 @@ import com.everis.salamanca.domain.Mock;
 import com.everis.salamanca.repository.MockRepository;
 import com.everis.salamanca.service.MockService;
 import com.everis.salamanca.web.rest.errors.ExceptionTranslator;
+import com.everis.salamanca.service.dto.MockCriteria;
+import com.everis.salamanca.service.MockQueryService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,6 +55,9 @@ public class MockResourceIT {
     private MockService mockService;
 
     @Autowired
+    private MockQueryService mockQueryService;
+
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -74,7 +79,7 @@ public class MockResourceIT {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final MockResource mockResource = new MockResource(mockService);
+        final MockResource mockResource = new MockResource(mockService, mockQueryService);
         this.restMockMockMvc = MockMvcBuilders.standaloneSetup(mockResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -209,6 +214,375 @@ public class MockResourceIT {
             .andExpect(jsonPath("$.output").value(DEFAULT_OUTPUT))
             .andExpect(jsonPath("$.url").value(DEFAULT_URL));
     }
+
+
+    @Test
+    @Transactional
+    public void getMocksByIdFiltering() throws Exception {
+        // Initialize the database
+        mockRepository.saveAndFlush(mock);
+
+        Long id = mock.getId();
+
+        defaultMockShouldBeFound("id.equals=" + id);
+        defaultMockShouldNotBeFound("id.notEquals=" + id);
+
+        defaultMockShouldBeFound("id.greaterThanOrEqual=" + id);
+        defaultMockShouldNotBeFound("id.greaterThan=" + id);
+
+        defaultMockShouldBeFound("id.lessThanOrEqual=" + id);
+        defaultMockShouldNotBeFound("id.lessThan=" + id);
+    }
+
+
+    @Test
+    @Transactional
+    public void getAllMocksByNameIsEqualToSomething() throws Exception {
+        // Initialize the database
+        mockRepository.saveAndFlush(mock);
+
+        // Get all the mockList where name equals to DEFAULT_NAME
+        defaultMockShouldBeFound("name.equals=" + DEFAULT_NAME);
+
+        // Get all the mockList where name equals to UPDATED_NAME
+        defaultMockShouldNotBeFound("name.equals=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    public void getAllMocksByNameIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        mockRepository.saveAndFlush(mock);
+
+        // Get all the mockList where name not equals to DEFAULT_NAME
+        defaultMockShouldNotBeFound("name.notEquals=" + DEFAULT_NAME);
+
+        // Get all the mockList where name not equals to UPDATED_NAME
+        defaultMockShouldBeFound("name.notEquals=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    public void getAllMocksByNameIsInShouldWork() throws Exception {
+        // Initialize the database
+        mockRepository.saveAndFlush(mock);
+
+        // Get all the mockList where name in DEFAULT_NAME or UPDATED_NAME
+        defaultMockShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
+
+        // Get all the mockList where name equals to UPDATED_NAME
+        defaultMockShouldNotBeFound("name.in=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    public void getAllMocksByNameIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        mockRepository.saveAndFlush(mock);
+
+        // Get all the mockList where name is not null
+        defaultMockShouldBeFound("name.specified=true");
+
+        // Get all the mockList where name is null
+        defaultMockShouldNotBeFound("name.specified=false");
+    }
+                @Test
+    @Transactional
+    public void getAllMocksByNameContainsSomething() throws Exception {
+        // Initialize the database
+        mockRepository.saveAndFlush(mock);
+
+        // Get all the mockList where name contains DEFAULT_NAME
+        defaultMockShouldBeFound("name.contains=" + DEFAULT_NAME);
+
+        // Get all the mockList where name contains UPDATED_NAME
+        defaultMockShouldNotBeFound("name.contains=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    public void getAllMocksByNameNotContainsSomething() throws Exception {
+        // Initialize the database
+        mockRepository.saveAndFlush(mock);
+
+        // Get all the mockList where name does not contain DEFAULT_NAME
+        defaultMockShouldNotBeFound("name.doesNotContain=" + DEFAULT_NAME);
+
+        // Get all the mockList where name does not contain UPDATED_NAME
+        defaultMockShouldBeFound("name.doesNotContain=" + UPDATED_NAME);
+    }
+
+
+    @Test
+    @Transactional
+    public void getAllMocksByInputIsEqualToSomething() throws Exception {
+        // Initialize the database
+        mockRepository.saveAndFlush(mock);
+
+        // Get all the mockList where input equals to DEFAULT_INPUT
+        defaultMockShouldBeFound("input.equals=" + DEFAULT_INPUT);
+
+        // Get all the mockList where input equals to UPDATED_INPUT
+        defaultMockShouldNotBeFound("input.equals=" + UPDATED_INPUT);
+    }
+
+    @Test
+    @Transactional
+    public void getAllMocksByInputIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        mockRepository.saveAndFlush(mock);
+
+        // Get all the mockList where input not equals to DEFAULT_INPUT
+        defaultMockShouldNotBeFound("input.notEquals=" + DEFAULT_INPUT);
+
+        // Get all the mockList where input not equals to UPDATED_INPUT
+        defaultMockShouldBeFound("input.notEquals=" + UPDATED_INPUT);
+    }
+
+    @Test
+    @Transactional
+    public void getAllMocksByInputIsInShouldWork() throws Exception {
+        // Initialize the database
+        mockRepository.saveAndFlush(mock);
+
+        // Get all the mockList where input in DEFAULT_INPUT or UPDATED_INPUT
+        defaultMockShouldBeFound("input.in=" + DEFAULT_INPUT + "," + UPDATED_INPUT);
+
+        // Get all the mockList where input equals to UPDATED_INPUT
+        defaultMockShouldNotBeFound("input.in=" + UPDATED_INPUT);
+    }
+
+    @Test
+    @Transactional
+    public void getAllMocksByInputIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        mockRepository.saveAndFlush(mock);
+
+        // Get all the mockList where input is not null
+        defaultMockShouldBeFound("input.specified=true");
+
+        // Get all the mockList where input is null
+        defaultMockShouldNotBeFound("input.specified=false");
+    }
+                @Test
+    @Transactional
+    public void getAllMocksByInputContainsSomething() throws Exception {
+        // Initialize the database
+        mockRepository.saveAndFlush(mock);
+
+        // Get all the mockList where input contains DEFAULT_INPUT
+        defaultMockShouldBeFound("input.contains=" + DEFAULT_INPUT);
+
+        // Get all the mockList where input contains UPDATED_INPUT
+        defaultMockShouldNotBeFound("input.contains=" + UPDATED_INPUT);
+    }
+
+    @Test
+    @Transactional
+    public void getAllMocksByInputNotContainsSomething() throws Exception {
+        // Initialize the database
+        mockRepository.saveAndFlush(mock);
+
+        // Get all the mockList where input does not contain DEFAULT_INPUT
+        defaultMockShouldNotBeFound("input.doesNotContain=" + DEFAULT_INPUT);
+
+        // Get all the mockList where input does not contain UPDATED_INPUT
+        defaultMockShouldBeFound("input.doesNotContain=" + UPDATED_INPUT);
+    }
+
+
+    @Test
+    @Transactional
+    public void getAllMocksByOutputIsEqualToSomething() throws Exception {
+        // Initialize the database
+        mockRepository.saveAndFlush(mock);
+
+        // Get all the mockList where output equals to DEFAULT_OUTPUT
+        defaultMockShouldBeFound("output.equals=" + DEFAULT_OUTPUT);
+
+        // Get all the mockList where output equals to UPDATED_OUTPUT
+        defaultMockShouldNotBeFound("output.equals=" + UPDATED_OUTPUT);
+    }
+
+    @Test
+    @Transactional
+    public void getAllMocksByOutputIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        mockRepository.saveAndFlush(mock);
+
+        // Get all the mockList where output not equals to DEFAULT_OUTPUT
+        defaultMockShouldNotBeFound("output.notEquals=" + DEFAULT_OUTPUT);
+
+        // Get all the mockList where output not equals to UPDATED_OUTPUT
+        defaultMockShouldBeFound("output.notEquals=" + UPDATED_OUTPUT);
+    }
+
+    @Test
+    @Transactional
+    public void getAllMocksByOutputIsInShouldWork() throws Exception {
+        // Initialize the database
+        mockRepository.saveAndFlush(mock);
+
+        // Get all the mockList where output in DEFAULT_OUTPUT or UPDATED_OUTPUT
+        defaultMockShouldBeFound("output.in=" + DEFAULT_OUTPUT + "," + UPDATED_OUTPUT);
+
+        // Get all the mockList where output equals to UPDATED_OUTPUT
+        defaultMockShouldNotBeFound("output.in=" + UPDATED_OUTPUT);
+    }
+
+    @Test
+    @Transactional
+    public void getAllMocksByOutputIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        mockRepository.saveAndFlush(mock);
+
+        // Get all the mockList where output is not null
+        defaultMockShouldBeFound("output.specified=true");
+
+        // Get all the mockList where output is null
+        defaultMockShouldNotBeFound("output.specified=false");
+    }
+                @Test
+    @Transactional
+    public void getAllMocksByOutputContainsSomething() throws Exception {
+        // Initialize the database
+        mockRepository.saveAndFlush(mock);
+
+        // Get all the mockList where output contains DEFAULT_OUTPUT
+        defaultMockShouldBeFound("output.contains=" + DEFAULT_OUTPUT);
+
+        // Get all the mockList where output contains UPDATED_OUTPUT
+        defaultMockShouldNotBeFound("output.contains=" + UPDATED_OUTPUT);
+    }
+
+    @Test
+    @Transactional
+    public void getAllMocksByOutputNotContainsSomething() throws Exception {
+        // Initialize the database
+        mockRepository.saveAndFlush(mock);
+
+        // Get all the mockList where output does not contain DEFAULT_OUTPUT
+        defaultMockShouldNotBeFound("output.doesNotContain=" + DEFAULT_OUTPUT);
+
+        // Get all the mockList where output does not contain UPDATED_OUTPUT
+        defaultMockShouldBeFound("output.doesNotContain=" + UPDATED_OUTPUT);
+    }
+
+
+    @Test
+    @Transactional
+    public void getAllMocksByUrlIsEqualToSomething() throws Exception {
+        // Initialize the database
+        mockRepository.saveAndFlush(mock);
+
+        // Get all the mockList where url equals to DEFAULT_URL
+        defaultMockShouldBeFound("url.equals=" + DEFAULT_URL);
+
+        // Get all the mockList where url equals to UPDATED_URL
+        defaultMockShouldNotBeFound("url.equals=" + UPDATED_URL);
+    }
+
+    @Test
+    @Transactional
+    public void getAllMocksByUrlIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        mockRepository.saveAndFlush(mock);
+
+        // Get all the mockList where url not equals to DEFAULT_URL
+        defaultMockShouldNotBeFound("url.notEquals=" + DEFAULT_URL);
+
+        // Get all the mockList where url not equals to UPDATED_URL
+        defaultMockShouldBeFound("url.notEquals=" + UPDATED_URL);
+    }
+
+    @Test
+    @Transactional
+    public void getAllMocksByUrlIsInShouldWork() throws Exception {
+        // Initialize the database
+        mockRepository.saveAndFlush(mock);
+
+        // Get all the mockList where url in DEFAULT_URL or UPDATED_URL
+        defaultMockShouldBeFound("url.in=" + DEFAULT_URL + "," + UPDATED_URL);
+
+        // Get all the mockList where url equals to UPDATED_URL
+        defaultMockShouldNotBeFound("url.in=" + UPDATED_URL);
+    }
+
+    @Test
+    @Transactional
+    public void getAllMocksByUrlIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        mockRepository.saveAndFlush(mock);
+
+        // Get all the mockList where url is not null
+        defaultMockShouldBeFound("url.specified=true");
+
+        // Get all the mockList where url is null
+        defaultMockShouldNotBeFound("url.specified=false");
+    }
+                @Test
+    @Transactional
+    public void getAllMocksByUrlContainsSomething() throws Exception {
+        // Initialize the database
+        mockRepository.saveAndFlush(mock);
+
+        // Get all the mockList where url contains DEFAULT_URL
+        defaultMockShouldBeFound("url.contains=" + DEFAULT_URL);
+
+        // Get all the mockList where url contains UPDATED_URL
+        defaultMockShouldNotBeFound("url.contains=" + UPDATED_URL);
+    }
+
+    @Test
+    @Transactional
+    public void getAllMocksByUrlNotContainsSomething() throws Exception {
+        // Initialize the database
+        mockRepository.saveAndFlush(mock);
+
+        // Get all the mockList where url does not contain DEFAULT_URL
+        defaultMockShouldNotBeFound("url.doesNotContain=" + DEFAULT_URL);
+
+        // Get all the mockList where url does not contain UPDATED_URL
+        defaultMockShouldBeFound("url.doesNotContain=" + UPDATED_URL);
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned.
+     */
+    private void defaultMockShouldBeFound(String filter) throws Exception {
+        restMockMockMvc.perform(get("/api/mocks?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(mock.getId().intValue())))
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
+            .andExpect(jsonPath("$.[*].input").value(hasItem(DEFAULT_INPUT)))
+            .andExpect(jsonPath("$.[*].output").value(hasItem(DEFAULT_OUTPUT)))
+            .andExpect(jsonPath("$.[*].url").value(hasItem(DEFAULT_URL)));
+
+        // Check, that the count call also returns 1
+        restMockMockMvc.perform(get("/api/mocks/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(content().string("1"));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned.
+     */
+    private void defaultMockShouldNotBeFound(String filter) throws Exception {
+        restMockMockMvc.perform(get("/api/mocks?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+
+        // Check, that the count call also returns 0
+        restMockMockMvc.perform(get("/api/mocks/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(content().string("0"));
+    }
+
 
     @Test
     @Transactional
