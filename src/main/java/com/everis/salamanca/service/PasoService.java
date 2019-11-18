@@ -2,7 +2,9 @@ package com.everis.salamanca.service;
 
 import com.everis.salamanca.domain.Paso;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.Optional;
 
 /**
@@ -21,9 +23,10 @@ public interface PasoService {
     /**
      * Get all the pasos.
      *
+     * @param pageable the pagination information.
      * @return the list of entities.
      */
-    List<Paso> findAll();
+    Page<Paso> findAll(Pageable pageable);
 
 
     /**

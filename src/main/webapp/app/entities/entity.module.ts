@@ -11,6 +11,10 @@ import { RouterModule } from '@angular/router';
       {
         path: 'paso',
         loadChildren: () => import('./paso/paso.module').then(m => m.InssMonoliticInstallerPasoModule)
+      },
+      {
+        path: 'mock',
+        loadChildren: () => import('./mock/mock.module').then(m => m.InssMonoliticInstallerMockModule)
       }
       /* jhipster-needle-add-entity-route - JHipster will add entity modules routes here */
     ])
