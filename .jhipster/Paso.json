@@ -38,7 +38,7 @@
     "changelogDate": "20191115085653",
     "entityTableName": "paso",
     "dto": "no",
-    "pagination": "no",
+    "pagination": "pagination",
     "service": "serviceImpl",
     "jpaMetamodelFiltering": false,
     "fluentMethods": true,
