@@ -31,6 +31,9 @@ relationship OneToMany {
     
 }
 
+filter Paso
+filter Mock
+filter Instalacion
 
 paginate Instalacion with pagination
 paginate Paso with pagination
