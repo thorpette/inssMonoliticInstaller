@@ -3,6 +3,8 @@ package com.everis.salamanca.web.rest;
 import com.everis.salamanca.domain.Mock;
 import com.everis.salamanca.service.MockService;
 import com.everis.salamanca.web.rest.errors.BadRequestAlertException;
+import com.everis.salamanca.service.dto.MockCriteria;
+import com.everis.salamanca.service.MockQueryService;
 
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
@@ -35,8 +37,11 @@ public class MockResource {
 
     private final MockService mockService;
 
-    public MockResource(MockService mockService) {
+    private final MockQueryService mockQueryService;
+
+    public MockResource(MockService mockService, MockQueryService mockQueryService) {
         this.mockService = mockService;
+        this.mockQueryService = mockQueryService;
     }
 
     /**
@@ -83,12 +88,26 @@ public class MockResource {
      * {@code GET  /mocks} : get all the mocks.
      *
 
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of mocks in body.
      */
     @GetMapping("/mocks")
-    public List<Mock> getAllMocks() {
-        log.debug("REST request to get all Mocks");
-        return mockService.findAll();
+    public ResponseEntity<List<Mock>> getAllMocks(MockCriteria criteria) {
+        log.debug("REST request to get Mocks by criteria: {}", criteria);
+        List<Mock> entityList = mockQueryService.findByCriteria(criteria);
+        return ResponseEntity.ok().body(entityList);
+    }
+
+    /**
+    * {@code GET  /mocks/count} : count all the mocks.
+    *
+    * @param criteria the criteria which the requested entities should match.
+    * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+    */
+    @GetMapping("/mocks/count")
+    public ResponseEntity<Long> countMocks(MockCriteria criteria) {
+        log.debug("REST request to count Mocks by criteria: {}", criteria);
+        return ResponseEntity.ok().body(mockQueryService.countByCriteria(criteria));
     }
 
     /**

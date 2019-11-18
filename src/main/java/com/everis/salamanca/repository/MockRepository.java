@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface MockRepository extends JpaRepository<Mock, Long> {
+public interface MockRepository extends JpaRepository<Mock, Long>, JpaSpecificationExecutor<Mock> {
 
 }

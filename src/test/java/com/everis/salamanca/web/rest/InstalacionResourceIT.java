@@ -2,9 +2,12 @@ package com.everis.salamanca.web.rest;
 
 import com.everis.salamanca.InssMonoliticInstallerApp;
 import com.everis.salamanca.domain.Instalacion;
+import com.everis.salamanca.domain.Paso;
 import com.everis.salamanca.repository.InstalacionRepository;
 import com.everis.salamanca.service.InstalacionService;
 import com.everis.salamanca.web.rest.errors.ExceptionTranslator;
+import com.everis.salamanca.service.dto.InstalacionCriteria;
+import com.everis.salamanca.service.InstalacionQueryService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,6 +50,9 @@ public class InstalacionResourceIT {
     private InstalacionService instalacionService;
 
     @Autowired
+    private InstalacionQueryService instalacionQueryService;
+
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -68,7 +74,7 @@ public class InstalacionResourceIT {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final InstalacionResource instalacionResource = new InstalacionResource(instalacionService);
+        final InstalacionResource instalacionResource = new InstalacionResource(instalacionService, instalacionQueryService);
         this.restInstalacionMockMvc = MockMvcBuilders.standaloneSetup(instalacionResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -193,6 +199,237 @@ public class InstalacionResourceIT {
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
             .andExpect(jsonPath("$.descripcion").value(DEFAULT_DESCRIPCION));
     }
+
+
+    @Test
+    @Transactional
+    public void getInstalacionsByIdFiltering() throws Exception {
+        // Initialize the database
+        instalacionRepository.saveAndFlush(instalacion);
+
+        Long id = instalacion.getId();
+
+        defaultInstalacionShouldBeFound("id.equals=" + id);
+        defaultInstalacionShouldNotBeFound("id.notEquals=" + id);
+
+        defaultInstalacionShouldBeFound("id.greaterThanOrEqual=" + id);
+        defaultInstalacionShouldNotBeFound("id.greaterThan=" + id);
+
+        defaultInstalacionShouldBeFound("id.lessThanOrEqual=" + id);
+        defaultInstalacionShouldNotBeFound("id.lessThan=" + id);
+    }
+
+
+    @Test
+    @Transactional
+    public void getAllInstalacionsByNameIsEqualToSomething() throws Exception {
+        // Initialize the database
+        instalacionRepository.saveAndFlush(instalacion);
+
+        // Get all the instalacionList where name equals to DEFAULT_NAME
+        defaultInstalacionShouldBeFound("name.equals=" + DEFAULT_NAME);
+
+        // Get all the instalacionList where name equals to UPDATED_NAME
+        defaultInstalacionShouldNotBeFound("name.equals=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    public void getAllInstalacionsByNameIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        instalacionRepository.saveAndFlush(instalacion);
+
+        // Get all the instalacionList where name not equals to DEFAULT_NAME
+        defaultInstalacionShouldNotBeFound("name.notEquals=" + DEFAULT_NAME);
+
+        // Get all the instalacionList where name not equals to UPDATED_NAME
+        defaultInstalacionShouldBeFound("name.notEquals=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    public void getAllInstalacionsByNameIsInShouldWork() throws Exception {
+        // Initialize the database
+        instalacionRepository.saveAndFlush(instalacion);
+
+        // Get all the instalacionList where name in DEFAULT_NAME or UPDATED_NAME
+        defaultInstalacionShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
+
+        // Get all the instalacionList where name equals to UPDATED_NAME
+        defaultInstalacionShouldNotBeFound("name.in=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    public void getAllInstalacionsByNameIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        instalacionRepository.saveAndFlush(instalacion);
+
+        // Get all the instalacionList where name is not null
+        defaultInstalacionShouldBeFound("name.specified=true");
+
+        // Get all the instalacionList where name is null
+        defaultInstalacionShouldNotBeFound("name.specified=false");
+    }
+                @Test
+    @Transactional
+    public void getAllInstalacionsByNameContainsSomething() throws Exception {
+        // Initialize the database
+        instalacionRepository.saveAndFlush(instalacion);
+
+        // Get all the instalacionList where name contains DEFAULT_NAME
+        defaultInstalacionShouldBeFound("name.contains=" + DEFAULT_NAME);
+
+        // Get all the instalacionList where name contains UPDATED_NAME
+        defaultInstalacionShouldNotBeFound("name.contains=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    public void getAllInstalacionsByNameNotContainsSomething() throws Exception {
+        // Initialize the database
+        instalacionRepository.saveAndFlush(instalacion);
+
+        // Get all the instalacionList where name does not contain DEFAULT_NAME
+        defaultInstalacionShouldNotBeFound("name.doesNotContain=" + DEFAULT_NAME);
+
+        // Get all the instalacionList where name does not contain UPDATED_NAME
+        defaultInstalacionShouldBeFound("name.doesNotContain=" + UPDATED_NAME);
+    }
+
+
+    @Test
+    @Transactional
+    public void getAllInstalacionsByDescripcionIsEqualToSomething() throws Exception {
+        // Initialize the database
+        instalacionRepository.saveAndFlush(instalacion);
+
+        // Get all the instalacionList where descripcion equals to DEFAULT_DESCRIPCION
+        defaultInstalacionShouldBeFound("descripcion.equals=" + DEFAULT_DESCRIPCION);
+
+        // Get all the instalacionList where descripcion equals to UPDATED_DESCRIPCION
+        defaultInstalacionShouldNotBeFound("descripcion.equals=" + UPDATED_DESCRIPCION);
+    }
+
+    @Test
+    @Transactional
+    public void getAllInstalacionsByDescripcionIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        instalacionRepository.saveAndFlush(instalacion);
+
+        // Get all the instalacionList where descripcion not equals to DEFAULT_DESCRIPCION
+        defaultInstalacionShouldNotBeFound("descripcion.notEquals=" + DEFAULT_DESCRIPCION);
+
+        // Get all the instalacionList where descripcion not equals to UPDATED_DESCRIPCION
+        defaultInstalacionShouldBeFound("descripcion.notEquals=" + UPDATED_DESCRIPCION);
+    }
+
+    @Test
+    @Transactional
+    public void getAllInstalacionsByDescripcionIsInShouldWork() throws Exception {
+        // Initialize the database
+        instalacionRepository.saveAndFlush(instalacion);
+
+        // Get all the instalacionList where descripcion in DEFAULT_DESCRIPCION or UPDATED_DESCRIPCION
+        defaultInstalacionShouldBeFound("descripcion.in=" + DEFAULT_DESCRIPCION + "," + UPDATED_DESCRIPCION);
+
+        // Get all the instalacionList where descripcion equals to UPDATED_DESCRIPCION
+        defaultInstalacionShouldNotBeFound("descripcion.in=" + UPDATED_DESCRIPCION);
+    }
+
+    @Test
+    @Transactional
+    public void getAllInstalacionsByDescripcionIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        instalacionRepository.saveAndFlush(instalacion);
+
+        // Get all the instalacionList where descripcion is not null
+        defaultInstalacionShouldBeFound("descripcion.specified=true");
+
+        // Get all the instalacionList where descripcion is null
+        defaultInstalacionShouldNotBeFound("descripcion.specified=false");
+    }
+                @Test
+    @Transactional
+    public void getAllInstalacionsByDescripcionContainsSomething() throws Exception {
+        // Initialize the database
+        instalacionRepository.saveAndFlush(instalacion);
+
+        // Get all the instalacionList where descripcion contains DEFAULT_DESCRIPCION
+        defaultInstalacionShouldBeFound("descripcion.contains=" + DEFAULT_DESCRIPCION);
+
+        // Get all the instalacionList where descripcion contains UPDATED_DESCRIPCION
+        defaultInstalacionShouldNotBeFound("descripcion.contains=" + UPDATED_DESCRIPCION);
+    }
+
+    @Test
+    @Transactional
+    public void getAllInstalacionsByDescripcionNotContainsSomething() throws Exception {
+        // Initialize the database
+        instalacionRepository.saveAndFlush(instalacion);
+
+        // Get all the instalacionList where descripcion does not contain DEFAULT_DESCRIPCION
+        defaultInstalacionShouldNotBeFound("descripcion.doesNotContain=" + DEFAULT_DESCRIPCION);
+
+        // Get all the instalacionList where descripcion does not contain UPDATED_DESCRIPCION
+        defaultInstalacionShouldBeFound("descripcion.doesNotContain=" + UPDATED_DESCRIPCION);
+    }
+
+
+    @Test
+    @Transactional
+    public void getAllInstalacionsByPasoIsEqualToSomething() throws Exception {
+        // Initialize the database
+        instalacionRepository.saveAndFlush(instalacion);
+        Paso paso = PasoResourceIT.createEntity(em);
+        em.persist(paso);
+        em.flush();
+        instalacion.addPaso(paso);
+        instalacionRepository.saveAndFlush(instalacion);
+        Long pasoId = paso.getId();
+
+        // Get all the instalacionList where paso equals to pasoId
+        defaultInstalacionShouldBeFound("pasoId.equals=" + pasoId);
+
+        // Get all the instalacionList where paso equals to pasoId + 1
+        defaultInstalacionShouldNotBeFound("pasoId.equals=" + (pasoId + 1));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned.
+     */
+    private void defaultInstalacionShouldBeFound(String filter) throws Exception {
+        restInstalacionMockMvc.perform(get("/api/instalacions?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(instalacion.getId().intValue())))
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
+            .andExpect(jsonPath("$.[*].descripcion").value(hasItem(DEFAULT_DESCRIPCION)));
+
+        // Check, that the count call also returns 1
+        restInstalacionMockMvc.perform(get("/api/instalacions/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(content().string("1"));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned.
+     */
+    private void defaultInstalacionShouldNotBeFound(String filter) throws Exception {
+        restInstalacionMockMvc.perform(get("/api/instalacions?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+
+        // Check, that the count call also returns 0
+        restInstalacionMockMvc.perform(get("/api/instalacions/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(content().string("0"));
+    }
+
 
     @Test
     @Transactional

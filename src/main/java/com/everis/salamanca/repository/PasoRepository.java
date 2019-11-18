@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface PasoRepository extends JpaRepository<Paso, Long> {
+public interface PasoRepository extends JpaRepository<Paso, Long>, JpaSpecificationExecutor<Paso> {
 
 }
